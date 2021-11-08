@@ -11,14 +11,17 @@ const users = [];
 
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers;
-  
-  const user = users.find(user => user.username === username)
-  if (!user) {
-    return response.status(404).json({error: "Usuário não encontrado"});
-  } else {
-    request.user = user;
-    return next();
+
+  const userFound = users.find((user) => user.username === username);
+
+  if (!userFound) {
+    return response.status(404).json({ error: "User not found" });
   }
+
+  request.user = userFound;
+
+  return next();
+  
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
@@ -27,7 +30,10 @@ function checksCreateTodosUserAvailability(request, response, next) {
   if ((!user.pro && user.todos.length < 10) || user.pro) {
     return next();
   } else {
-    return response.status(403).json();
+    return response.status(403).json({
+      error:
+        "Your subscription is FREE and you ran out of todos :(. Go PRO and enjoy!",
+    });
   }
 }
 
