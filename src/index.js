@@ -11,15 +11,13 @@ const users = [];
 
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers;
-  const usernameAlreadyExists = users.some(
-    (user) => user.username === username
-  );
+  
   const user = users.find(user => user.username === username)
-  if (usernameAlreadyExists) {
+  if (!user) {
+    return response.status(404).json({error: "Usuário não encontrado"});
+  } else {
     request.user = user;
     return next();
-  } else {
-    return response.status(404).json();
   }
 }
 
