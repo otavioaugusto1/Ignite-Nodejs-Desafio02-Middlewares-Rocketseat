@@ -25,13 +25,11 @@ function checksExistsUserAccount(request, response, next) {
 
 function checksCreateTodosUserAvailability(request, response, next) {
   const { user } = request;
-  if(user.pro){
+
+  if ((!user.pro && user.todos.length < 10) || user.pro) {
     return next();
-  }
-  else if (user.pro == false && user.todos.length >= 10) {
-    return response.status(403).send();
-  } else{
-    return next();
+  } else {
+    return response.status(403).json();
   }
 }
 
