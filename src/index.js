@@ -35,20 +35,26 @@ function checksTodoExists(request, response, next) {
   const { username } = request.headers;
   const { id } = request.params;
 
-  const userAlreadyExists = users.find((user) => user.username === username);
+  const user = users.find((user) => user.username === username);
+  const validId = validate(id);
 
-  if (!userAlreadyExists) {
-    return response.status(404).send();
-  } else {
-    if (!validate(userAlreadyExists.todos.id)) {
-      return response.status(400).send();
-    }
-    if (!userAlreadyExists.some((user) => user.todos.id == id)) {
-      return response.status(404).send();
-    }
+  if (!user) {
+    return response.status(404).json({ error: "User not found." });
   }
-  request.user = userAlreadyExists;
-  request.todo = userAlreadyExists.find((user) => user.todos.id == id);
+
+  if (!validId) {
+    return response.status(400).json({ error: "Todo id is not a valid UUID." });
+  }
+
+  const todo = user.todos.find((todo) => todo.id === id);
+
+  if (!todo) {
+    return response.status(404).json({ error: "Todo id not found." });
+  }
+
+  request.user = user;
+  request.todo = todo;
+
   return next();
 }
 
